@@ -24,6 +24,8 @@ public class User {
     @XmlElement
     private boolean visible;
     @XmlElement
+    private String token;
+    @XmlElement
     int typeOfUser;
     @XmlElement
     public static final int DEVELOPER = 100;
@@ -33,9 +35,6 @@ public class User {
     public static final int PRODUCTOWNER = 300;
     @XmlElement
     public static final int NOTASSIGNED = 400;
-    @XmlElement
-    private ArrayList<Task> userTasks = new ArrayList<>(); //ser array de ids das tasks assim as tasks ficavam no json das tasks
-
     public User() {
     }
 
@@ -64,14 +63,6 @@ public class User {
 
     public void setEmail(String email) {
         this.email = email;
-    }
-
-    public ArrayList<Task> getUserTasks() {
-        return userTasks;
-    }
-
-    public void setUserTasks(ArrayList<Task> userTasks) {
-        this.userTasks = userTasks;
     }
 
     public String getFirstName() {
@@ -131,6 +122,14 @@ public class User {
         }
     }
 
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
+    }
+
     @Override
     public String toString() {
         return "User{" +
@@ -140,8 +139,7 @@ public class User {
                 ", firstName='" + firstName + '\'' +
                 ", lastName='" + lastName + '\'' +
                 ", phone='" + phone + '\'' +
-                ", photoURL='" + photoURL + '\'' +
-                ", userTasks=" + userTasks +
+                ", photoURL='" + photoURL +
                 '}';
     }
 }

@@ -72,14 +72,15 @@ public class UserBean implements Serializable {
     }
 
     //Permite ao utilizador entrar na app, gera token
-    public String login(Login user) {
+    public User login(Login user) {
         UserEntity userEntity = userDao.findUserByUsername(user.getUsername());
         if (userEntity != null && userEntity.isVisible()) {
             //Verifica se a password coincide com a password encriptada
             if (BCrypt.checkpw(user.getPassword(), userEntity.getPassword())) {
                 String token = generateNewToken();
                 userEntity.setToken(token);
-                return token;
+                User userDto = convertUserEntitytoUserDto(userEntity);
+                return createUserLogged(userDto);
             }
         }
         return null;
@@ -177,6 +178,11 @@ public class UserBean implements Serializable {
         user.setPhone(userEntity.getPhone());
         user.setPhotoURL(userEntity.getPhotoURL());
         user.setVisible(userEntity.isVisible());
+        if (userEntity.getToken() != null) {
+            user.setToken(userEntity.getToken());
+        } else {
+            user.setToken(null);
+        }
 
         return user;
     }
@@ -308,57 +314,55 @@ public class UserBean implements Serializable {
         return null;
     }
 
-    //Coloco username porque no objeto de atualização não está referenciado
+    public User createUserLogged(User user) {
+        User userLogged = new User();
+        userLogged.setUsername(user.getUsername());
+        userLogged.setEmail(user.getEmail());
+        userLogged.setFirstName(user.getFirstName());
+        userLogged.setLastName(user.getLastName());
+        userLogged.setPhone(user.getPhone());
+        userLogged.setPhotoURL(user.getPhotoURL());
+        userLogged.setTypeOfUser(user.getTypeOfUser());
+        userLogged.setToken(user.getToken());
+        return userLogged;
+    }
+
     public boolean updateUser(User user, String username) {
         boolean status = false;
 
-        // Busca o user pelo username
         UserEntity u = userDao.findUserByUsername(username);
 
         if (u != null && u.getUsername().equals(username)){
 
-            // Verifica se o email no objeto User é nulo ou vazio
             if (user.getEmail() != null && !user.getEmail().isEmpty()) {
-                // Se não for nulo nem vazio, atualiza o email
                 u.setEmail(user.getEmail());
             }
 
-            // Verifica se o contacto no objeto User é nulo ou vazio
             if (user.getPhone() != null && !user.getPhone().isEmpty()) {
-                // Se não for nulo nem vazio, atualiza o contacto
                 u.setPhone(user.getPhone());
             }
 
-            // Verifica se o primeiro nome no objeto User é nulo ou vazio
             if (user.getFirstName() != null && !user.getFirstName().isEmpty()) {
-                // Se não for nulo nem vazio, atualiza o primeiro nome
                 u.setFirstName(user.getFirstName());
             }
 
-            // Verifica se o apelido no objeto User é nulo ou vazio
             if (user.getLastName() != null && !user.getLastName().isEmpty()) {
-                // Se não for nulo nem vazio, atualiza o apelido
                 u.setLastName(user.getLastName());
             }
 
-            // Verifica se a foto no objeto User é nulo ou vazio
             if (user.getPhotoURL() != null && !user.getPhotoURL().isEmpty()) {
-                // Se não for nulo nem vazio, atualiza a foto
                 u.setPhotoURL(user.getPhotoURL());
             }
 
-            // Verifica se o typeOfUser no objeto User é nulo ou vazio
             if (user.getTypeOfUser() != 0) {
-                // Se não for nulo nem vazio, atualiza a foto
                 u.setTypeOfUser(user.getTypeOfUser());
             }
 
             try{
-                userDao.merge(u); //Atualiza o user na base de dados
+                userDao.merge(u);
                 status = true;
             } catch (Exception e){
                 e.printStackTrace();
-                status = false;
             }
         }
 

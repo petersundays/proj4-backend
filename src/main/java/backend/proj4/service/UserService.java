@@ -30,11 +30,11 @@ public class UserService {
     @Produces(MediaType.APPLICATION_JSON)
     public Response login(Login login) {
 
-        String token = userBean.login(login);
+        User userLogged = userBean.login(login);
         Response response;
 
-        if (token != null) {
-            response = Response.status(200).entity(token).build();
+        if (userLogged != null) {
+            response = Response.status(200).entity(userLogged).build();
         } else {
             response = Response.status(401).entity("Invalid credentials").build();
         }
@@ -168,21 +168,20 @@ public class UserService {
 
     //Atualizar um user
     @PUT
-    @Path("/update/{username}")
+    @Path("/update-profile/{username}")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response updateUser(@PathParam("username") String username, @HeaderParam("token") String token, User user) {
+        System.out.println("****************** USER " + user);
         Response response;
 
         User userUpdate = userBean.getUser(username);
 
-        //Verifica se o username existe na base de dados
         if (userUpdate==null){
             response = Response.status(Response.Status.NOT_FOUND).entity("User not found").build();
             return response;
         }
 
-        //Verifica se token existe de quem consulta e se é Product Owner ou o próprio user
         if (userBean.isAuthenticated(token) && userBean.userIsProductOwner(token) || userBean.thisTokenIsFromThisUsername(token,username)) {
             if (!userBean.isEmailUpdatedValid(user) && user.getEmail() != null) {
                 response = Response.status(422).entity("Invalid email").build();
@@ -217,13 +216,13 @@ public class UserService {
             // Verificar password antiga
             boolean isOldPasswordValid = userBean.verifyOldPassword(username, oldPassword);
             if (!isOldPasswordValid) {
-                return Response.status(401).entity("Incorrect old password").build();
+                return Response.status(401).entity("Current password is incorrect").build();
             }
             // Se a password antiga é válida, update a password
             boolean updated = userBean.updatePassword(username, newPassword);
             if (!updated) {
                 return Response.status(400).entity("User with this username is not found").build();
-            }else return Response.status(200).entity("User password updated").build();
+            }else return Response.status(200).entity("Password updated").build();
         }else
             return Response.status(401).entity("User is not logged in").build();
     }
@@ -417,7 +416,7 @@ public class UserService {
     }
 
     @GET
-    @Path("/{username}/tasks")
+    @Path("/{username}/tasks")  
     @Produces(MediaType.APPLICATION_JSON)
     public Response getAllTasksFromUser(@HeaderParam("token") String token, @PathParam("username") String username) {
 
@@ -696,9 +695,7 @@ public class UserService {
         if (userBean.isAuthenticated(token)) {
                 if (userBean.userIsProductOwner(token)) {
                     try {
-                        System.out.println("########################## TRY " + categoryName + " " + newCategoryName);
                         boolean edited = categoryBean.editCategory(categoryName, newCategoryName);
-                        System.out.println("************************** EDITED ENDPOINT " + edited + " *********************************");
                         if (edited) {
                             response = Response.status(200).entity("Category edited successfully").build();
                         } else {
