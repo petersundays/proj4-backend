@@ -468,11 +468,12 @@ public class UserService {
     @PUT
     @Path("/updatetask/{id}")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response updateTask(@HeaderParam("token") String token, @HeaderParam("categoryName") String categoryName, @HeaderParam("startDate") String startDate, @HeaderParam("limitDate") String limitDate,  @PathParam("id") String id, Task task) {
+    public Response updateTask(@HeaderParam("token") String token, @PathParam("id") String id, Task task) {
+
         Response response;
         if (userBean.isAuthenticated(token)) {
             if (userBean.userIsTaskOwner(token, id) || userBean.userIsScrumMaster(token) || userBean.userIsProductOwner(token)) {
-                boolean updated = taskBean.updateTask(task, id, categoryName, startDate, limitDate);
+                boolean updated = taskBean.updateTask(task, id);
                 if (updated) {
                     response = Response.status(200).entity("Task updated successfully").build();
                 } else {
