@@ -608,6 +608,25 @@ public class UserService {
         return response;
     }
 
+
+    @GET
+    @Path("/notErasedTasks")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getNotErasedTasks(@HeaderParam("token") String token) {
+        Response response;
+        if (userBean.isAuthenticated(token)) {
+            if (userBean.userIsScrumMaster(token) || userBean.userIsProductOwner(token)) {
+                ArrayList<Task> notErasedTasks = taskBean.getNotErasedTasks();
+                response = Response.status(200).entity(notErasedTasks).build();
+            } else {
+                response = Response.status(403).entity("You don't have permission for this request").build();
+            }
+        } else {
+            response = Response.status(401).entity("Invalid credentials").build();
+        }
+        return response;
+    }
+
     @GET
     @Path("/erasedTasks")
     @Produces(MediaType.APPLICATION_JSON)

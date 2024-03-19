@@ -176,6 +176,17 @@ public class TaskBean implements Serializable {
         return valid;
     }
 
+    public ArrayList<Task> getNotErasedTasks() {
+        ArrayList<TaskEntity> entityTasks = taskDao.findNotErasedTasks();
+        ArrayList<Task> tasks = new ArrayList<>();
+        if (entityTasks != null) {
+            for (TaskEntity taskEntity : entityTasks) {
+                tasks.add(convertTaskEntityToTaskDto(taskEntity));
+            }
+        }
+        return tasks;
+    }
+
     public ArrayList<Task> getErasedTasks() {
         ArrayList<TaskEntity> entityTasks = taskDao.findErasedTasks();
         ArrayList<Task> tasks = new ArrayList<>();

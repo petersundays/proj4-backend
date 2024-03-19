@@ -36,6 +36,14 @@ public class TaskDao extends AbstractDao<TaskEntity> {
 		}
 	}
 
+	public ArrayList<TaskEntity> findNotErasedTasks() {
+		try {
+			return (ArrayList<TaskEntity>) em.createNamedQuery("Task.findNotErasedTasks").getResultList();
+		} catch (Exception e) {
+			return null;
+		}
+	}
+
 	public ArrayList<TaskEntity> findErasedTasks() {
 		try {
             return (ArrayList<TaskEntity>) em.createNamedQuery("Task.findErasedTasks").getResultList();
