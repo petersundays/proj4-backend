@@ -109,7 +109,17 @@ public class UserBean implements Serializable {
                 if (user.getUsername().equals("admin")){
                     user.setTypeOfUser(300);
                 }else{
-                    user.setInitialTypeOfUser();
+                    if (user.getTypeOfUser() != 100 && user.getTypeOfUser() != 200 && user.getTypeOfUser() != 300) {
+                        user.setInitialTypeOfUser();
+                    } else {
+                        if (user.getTypeOfUser() == 100) {
+                            user.setTypeOfUser(User.DEVELOPER);
+                        } else if (user.getTypeOfUser() == 200) {
+                            user.setTypeOfUser(User.SCRUMMASTER);
+                        } else if (user.getTypeOfUser() == 300) {
+                            user.setTypeOfUser(User.PRODUCTOWNER);
+                        }
+                    }
                 }
 
                 user.setVisible(true);
