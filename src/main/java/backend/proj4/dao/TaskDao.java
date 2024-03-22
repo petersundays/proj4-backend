@@ -93,4 +93,30 @@ public class TaskDao extends AbstractDao<TaskEntity> {
 		return deleted;
 	}
 
+	public boolean deleteAllTasksFromUser(UserEntity owner) {
+		boolean deleted = false;
+		if (owner == null) {
+			deleted = false;
+		} else {
+			try {
+				em.createNamedQuery("Task.deleteAllErasedTasksFromUser").setParameter("owner", owner).executeUpdate();
+				deleted = true;
+			} catch (Exception e) {
+				deleted = false;
+			}
+		}
+		return deleted;
+	}
+
+	public boolean deleteAllErasedTasks() {
+		boolean deleted = false;
+		try {
+			em.createNamedQuery("Task.deleteAllErasedTasks").executeUpdate();
+			deleted = true;
+		} catch (Exception e) {
+			deleted = false;
+		}
+		return deleted;
+	}
+
 }

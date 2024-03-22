@@ -206,13 +206,49 @@ public class TaskBean implements Serializable {
             if (userTasks != null) {
                 for (TaskEntity taskEntity : userTasks) {
                     taskEntity.setErased(true);
-                    taskEntity.setOwner(userDao.findUserByUsername("NotAssigned"));
                     taskDao.merge(taskEntity);
                 }
                 erased = true;
             }
         }
         return erased;
+    }
+
+    public boolean restoreAllTasksFromUser(String username) {
+        boolean restore = false;
+        UserEntity userEntity = userDao.findUserByUsername(username);
+        if (userEntity != null) {
+            ArrayList<TaskEntity> userTasks = taskDao.findTasksByUser(userEntity);
+            if (userTasks != null) {
+                for (TaskEntity taskEntity : userTasks) {
+                    taskEntity.setErased(false);
+                    taskDao.merge(taskEntity);
+                }
+                restore = true;
+            }
+        }
+        return restore;
+    }
+
+    public boolean deleteAllErasedTasksFromUser(String username) {
+        boolean deleted = false;
+        UserEntity userEntity = userDao.findUserByUsername(username);
+        if (userEntity != null) {
+            taskDao.deleteAllTasksFromUser(userEntity);
+            deleted = true;
+        }
+        return deleted;
+    }
+
+    public boolean deleteAllErasedTasks () {
+        boolean deleted = false;
+         try {
+            taskDao.deleteAllErasedTasks();
+            deleted = true;
+        } catch (Exception e) {
+            deleted = false;
+         }
+        return deleted;
     }
 
 

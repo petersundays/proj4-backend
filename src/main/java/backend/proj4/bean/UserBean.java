@@ -139,11 +139,15 @@ public class UserBean implements Serializable {
         if (u != null) {
             ArrayList<TaskEntity> tasks = taskDao.findTasksByUser(u);
             UserEntity notAssigned = userDao.findUserByUsername("NOTASSIGNED");
+
+            notAssigned.addNewTasks(tasks);
+
             for (TaskEntity t : tasks) {
                 t.setOwner(notAssigned);
                 taskDao.merge(t);
             }
             userDao.remove(u);
+
             return true;
         } else
             return false;
@@ -232,7 +236,7 @@ public class UserBean implements Serializable {
             ArrayList<User> users = new ArrayList<>();
             for (UserEntity userE : userEntities) {
 
-                if (userE.getTypeOfUser()!=400){
+                if (userE.getTypeOfUser()!=400 && !userE.getUsername().equalsIgnoreCase("admin")){
                     users.add(convertUserEntitytoUserDto(userE));
                 }
             }

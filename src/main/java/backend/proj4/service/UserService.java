@@ -562,6 +562,33 @@ public class UserService {
         return response;
     }
 
+    @PUT
+    @Path("/restoreAllTasks/{username}")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response restoreAllTasksFromUser(@HeaderParam("token") String token, @PathParam("username") String username) {
+
+        Response response;
+        if (userBean.isAuthenticated(token)) {
+            if (userBean.userIsProductOwner(token)) {
+                try {
+                    boolean erased = taskBean.restoreAllTasksFromUser(username);
+                    if (erased) {
+                        response = Response.status(200).entity("All tasks were restored successfully").build();
+                    } else {
+                        response = Response.status(404).entity("Impossible to restore tasks").build();
+                    }
+                } catch (Exception e) {
+                    response = Response.status(404).entity("Something went wrong. The tasks were not restored.").build();
+                }
+            } else {
+                response = Response.status(403).entity("You don't have permission to restore these tasks").build();
+            }
+        } else {
+            response = Response.status(401).entity("Invalid credentials").build();
+        }
+        return response;
+    }
+
     @DELETE
     @Path("/delete/{taskId}")
     @Consumes(MediaType.APPLICATION_JSON)
@@ -589,6 +616,65 @@ public class UserService {
         return response;
     }
 
+    @DELETE
+    @Path("/{username}/tasks")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response deleteAllTasksFromUser(@HeaderParam("token") String token, @PathParam("username") String username) {
+
+        Response response;
+        if (userBean.isAuthenticated(token)) {
+            if (userBean.userIsProductOwner(token)) {
+                try {
+                    boolean deleted = taskBean.deleteAllErasedTasksFromUser(username);
+                    if (deleted) {
+                        response = Response.status(200).entity("All tasks were removed successfully").build();
+                    } else {
+                        response = Response.status(404).entity("Impossible to remove tasks").build();
+                    }
+                } catch (Exception e) {
+                    response = Response.status(404).entity("Something went wrong. The tasks were not removed.").build();
+                }
+            } else {
+                response = Response.status(403).entity("You don't have permission to delete these tasks").build();
+            }
+        } else {
+            response = Response.status(401).entity("Invalid credentials").build();
+        }
+        return response;
+
+    }
+
+    @DELETE
+    @Path("/tasks")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response deleteAllErased(@HeaderParam("token") String token) {
+
+        Response response;
+        if (userBean.isAuthenticated(token)) {
+            if (userBean.userIsProductOwner(token)) {
+                try {
+                    boolean deleted = taskBean.deleteAllErasedTasks();
+                    if (deleted) {
+                        response = Response.status(200).entity("All tasks were deleted successfully").build();
+                    } else {
+                        response = Response.status(404).entity("Impossible to delete tasks").build();
+                    }
+                } catch (Exception e) {
+                    response = Response.status(404).entity("Something went wrong. The tasks were not deleted.").build();
+                }
+            } else {
+                response = Response.status(403).entity("You don't have permission to delete these tasks").build();
+            }
+        } else {
+            response = Response.status(401).entity("Invalid credentials").build();
+        }
+        return response;
+
+    }
+
+
+
+
     @GET
     @Path("/tasks/{category}")
     @Produces(MediaType.APPLICATION_JSON)
@@ -598,6 +684,7 @@ public class UserService {
         if (userBean.isAuthenticated(token)) {
             if (userBean.userIsScrumMaster(token) || userBean.userIsProductOwner(token)) {
                 ArrayList<Task> tasksByCategory = taskBean.getTasksByCategory(category);
+                tasksByCategory.sort(Comparator.comparing(Task::getPriority, Comparator.reverseOrder()).thenComparing(Comparator.comparing(Task::getStartDate).thenComparing(Task::getLimitDate)));
                 response = Response.status(200).entity(tasksByCategory).build();
             } else {
                 response = Response.status(403).entity("You don't have permission for this request").build();
@@ -674,14 +761,13 @@ public class UserService {
         } else {
             response = Response.status(401).entity("Invalid credentials").build();
         }
-        return response; // FALTA FAZER VERIFICAÇÃO DAS PERMISSÕES DO UTILIZADOR PARA CRIAR CATEGORIA
+        return response; 
     }
 
     @DELETE
     @Path("/deleteCategory/{categoryName}")
     @Consumes(MediaType.APPLICATION_JSON)
     public Response deleteCategory(@HeaderParam("token") String token, @PathParam("categoryName") String categoryName) {
-        System.out.println("********************** CATEGORY NAME " + categoryName);
         Response response;
 
         if (userBean.isAuthenticated(token)) {

@@ -16,6 +16,8 @@ import java.time.LocalDate;
 @NamedQuery(name="Task.findErasedTasks", query="SELECT a FROM TaskEntity a WHERE a.erased = true")
 @NamedQuery(name="Task.findAllTasks", query="SELECT a FROM TaskEntity a")
 @NamedQuery(name="DeleteTask", query="DELETE FROM TaskEntity a WHERE a.id = :id")
+@NamedQuery(name="Task.deleteAllErasedTasksFromUser", query="DELETE FROM TaskEntity a WHERE a.owner = :owner AND a.erased = true")
+@NamedQuery(name="Task.deleteAllErasedTasks", query="DELETE FROM TaskEntity a WHERE a.erased = true")
 
 
 public class TaskEntity implements Serializable{
