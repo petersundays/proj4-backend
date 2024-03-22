@@ -9,15 +9,17 @@ import java.time.LocalDate;
 
 @Entity
 @Table(name="task")
-@NamedQuery(name="Task.findTaskById", query="SELECT a FROM TaskEntity a WHERE a.id = :id")// os : significam que, neste caso o id é um parametro/atributo
-@NamedQuery(name="Task.findTasksByUser", query="SELECT a FROM TaskEntity a WHERE a.owner = :owner")
-@NamedQuery(name="Task.findTasksByCategory", query="SELECT a FROM TaskEntity a WHERE a.category = :category")
-@NamedQuery(name="Task.findNotErasedTasks", query="SELECT a FROM TaskEntity a WHERE a.erased = false")
-@NamedQuery(name="Task.findErasedTasks", query="SELECT a FROM TaskEntity a WHERE a.erased = true")
-@NamedQuery(name="Task.findAllTasks", query="SELECT a FROM TaskEntity a")
+@NamedQuery(name="Task.findTaskById", query="SELECT a FROM TaskEntity a WHERE a.id = :id ORDER BY a.priority DESC, a.startDate ASC, a.limitDate ASC")// os : significam que, neste caso o id é um parametro/atributo
+@NamedQuery(name="Task.findTasksByUser", query="SELECT a FROM TaskEntity a WHERE a.owner = :owner ORDER BY a.priority DESC, a.startDate ASC, a.limitDate ASC")
+@NamedQuery(name="Task.findTasksByCategory", query="SELECT a FROM TaskEntity a WHERE a.category = :category ORDER BY a.priority DESC, a.startDate ASC, a.limitDate ASC")
+@NamedQuery(name="Task.findNotErasedTasks", query="SELECT a FROM TaskEntity a WHERE a.erased = false ORDER BY a.priority DESC, a.startDate ASC, a.limitDate ASC")
+@NamedQuery(name="Task.findErasedTasks", query="SELECT a FROM TaskEntity a WHERE a.erased = true ORDER BY a.priority DESC, a.startDate ASC, a.limitDate ASC")
+@NamedQuery(name="Task.findAllTasks", query="SELECT a FROM TaskEntity a ORDER BY a.priority DESC, a.startDate ASC, a.limitDate ASC")
 @NamedQuery(name="DeleteTask", query="DELETE FROM TaskEntity a WHERE a.id = :id")
 @NamedQuery(name="Task.deleteAllErasedTasksFromUser", query="DELETE FROM TaskEntity a WHERE a.owner = :owner AND a.erased = true")
 @NamedQuery(name="Task.deleteAllErasedTasks", query="DELETE FROM TaskEntity a WHERE a.erased = true")
+@NamedQuery(name="Tasks.restoreAllErasedTasks", query="UPDATE TaskEntity a SET a.erased = false WHERE a.erased = true")
+@NamedQuery(name="Task.eraseAllNotErasedTasks", query="UPDATE TaskEntity a SET a.erased = true WHERE a.erased = false")
 
 
 public class TaskEntity implements Serializable{

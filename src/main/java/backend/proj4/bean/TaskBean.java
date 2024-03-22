@@ -214,6 +214,17 @@ public class TaskBean implements Serializable {
         return erased;
     }
 
+    public boolean eraseAllNotErasedTasks() {
+        boolean erased = false;
+        try {
+            taskDao.eraseAllNotErasedTasks();
+            erased = true;
+        } catch (Exception e) {
+            erased = false;
+        }
+        return erased;
+    }
+
     public boolean restoreAllTasksFromUser(String username) {
         boolean restore = false;
         UserEntity userEntity = userDao.findUserByUsername(username);
@@ -229,6 +240,18 @@ public class TaskBean implements Serializable {
         }
         return restore;
     }
+
+    public boolean restoreAllErasedTasks() {
+        boolean restored = false;
+        try {
+            taskDao.restoreAllErasedTasks();
+            restored = true;
+        } catch (Exception e) {
+            restored = false;
+        }
+        return restored;
+    }
+
 
     public boolean deleteAllErasedTasksFromUser(String username) {
         boolean deleted = false;

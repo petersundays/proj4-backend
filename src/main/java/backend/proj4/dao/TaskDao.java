@@ -77,6 +77,16 @@ public class TaskDao extends AbstractDao<TaskEntity> {
 		return erased;
 	}
 
+public boolean eraseAllNotErasedTasks() {
+		boolean erased = false;
+		try {
+			em.createNamedQuery("Task.eraseAllNotErasedTasks").executeUpdate();
+			erased = true;
+		} catch (Exception e) {
+			erased = false;
+		}
+		return erased;
+	}
 
 	public boolean deleteTask(String id) {
 		boolean deleted = false;
@@ -106,6 +116,17 @@ public class TaskDao extends AbstractDao<TaskEntity> {
 			}
 		}
 		return deleted;
+	}
+
+	public boolean restoreAllErasedTasks() {
+		boolean restored = false;
+		try {
+			em.createNamedQuery("Tasks.restoreAllErasedTasks").executeUpdate();
+			restored = true;
+		} catch (Exception e) {
+			restored = false;
+		}
+		return restored;
 	}
 
 	public boolean deleteAllErasedTasks() {

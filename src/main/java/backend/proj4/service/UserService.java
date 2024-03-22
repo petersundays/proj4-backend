@@ -10,7 +10,6 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 
 @Path("/users")
@@ -407,7 +406,6 @@ public class UserService {
 
         if (userBean.isAuthenticated(token)) {
             ArrayList<Task> allTasks = taskBean.getAllTasks(token);
-            allTasks.sort(Comparator.comparing(Task::getPriority, Comparator.reverseOrder()).thenComparing(Comparator.comparing(Task::getStartDate).thenComparing(Task::getLimitDate)));
             response = Response.status(Response.Status.OK).entity(allTasks).build();
         } else {
             response = Response.status(401).entity("Invalid credentials").build();
@@ -425,7 +423,6 @@ public class UserService {
         if (userBean.isAuthenticated(token)) {
             if (userBean.thisTokenIsFromThisUsername(token, username) || userBean.userIsProductOwner(token) || userBean.userIsScrumMaster(token)){
                 ArrayList<Task> userTasks = taskBean.getAllTasksFromUser(username, token);
-                userTasks.sort(Comparator.comparing(Task::getPriority, Comparator.reverseOrder()).thenComparing(Comparator.comparing(Task::getStartDate).thenComparing(Task::getLimitDate)));
                 response = Response.status(Response.Status.OK).entity(userTasks).build();
             } else {
                 response = Response.status(406).entity("You don't have permission for this request").build();
@@ -536,15 +533,15 @@ public class UserService {
     }
 
     @PUT
-    @Path("/eraseAllTasks/{username}")
+    @Path("/eraseAllTasks")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response eraseAllTasksFromUser(@HeaderParam("token") String token, @PathParam("username") String username) {
+    public Response eraseAllTasks(@HeaderParam("token") String token) {
 
         Response response;
         if (userBean.isAuthenticated(token)) {
             if (userBean.userIsProductOwner(token)) {
                 try {
-                    boolean erased = taskBean.eraseAllTasksFromUser(username);
+                    boolean erased = taskBean.eraseAllNotErasedTasks();
                     if (erased) {
                         response = Response.status(200).entity("All tasks were erased successfully").build();
                     } else {
@@ -563,7 +560,34 @@ public class UserService {
     }
 
     @PUT
-    @Path("/restoreAllTasks/{username}")
+    @Path("/eraseAllTasks/{username}")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response eraseAllTasksFromUser(@HeaderParam("token") String token, @PathParam("username") String username) {
+
+        Response response;
+        if (userBean.isAuthenticated(token)) {
+            if (userBean.userIsProductOwner(token)) {
+                try {
+                    boolean erased = taskBean.eraseAllTasksFromUser(username);
+                    if (erased) {
+                        response = Response.status(200).entity("All tasks from " + username.toUpperCase() + " were erased successfully").build();
+                    } else {
+                        response = Response.status(404).entity("Impossible to erase tasks").build();
+                    }
+                } catch (Exception e) {
+                    response = Response.status(404).entity("Something went wrong. The tasks were not erased.").build();
+                }
+            } else {
+                response = Response.status(403).entity("You don't have permission to erase these tasks").build();
+            }
+        } else {
+            response = Response.status(401).entity("Invalid credentials").build();
+        }
+        return response;
+    }
+
+    @PUT
+    @Path("/restoreAllTasksFromUser/{username}")
     @Consumes(MediaType.APPLICATION_JSON)
     public Response restoreAllTasksFromUser(@HeaderParam("token") String token, @PathParam("username") String username) {
 
@@ -573,7 +597,7 @@ public class UserService {
                 try {
                     boolean erased = taskBean.restoreAllTasksFromUser(username);
                     if (erased) {
-                        response = Response.status(200).entity("All tasks were restored successfully").build();
+                        response = Response.status(200).entity("All tasks from " + username.toUpperCase() + " were restored successfully.").build();
                     } else {
                         response = Response.status(404).entity("Impossible to restore tasks").build();
                     }
@@ -588,6 +612,35 @@ public class UserService {
         }
         return response;
     }
+
+
+    @PUT
+    @Path("/restoreAllTasks")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response restoreAllErasedTasks(@HeaderParam("token") String token) {
+
+        Response response;
+        if (userBean.isAuthenticated(token)) {
+            if (userBean.userIsProductOwner(token)) {
+                try {
+                    boolean erased = taskBean.restoreAllErasedTasks();
+                    if (erased) {
+                        response = Response.status(200).entity("All tasks were restored successfully.").build();
+                    } else {
+                        response = Response.status(404).entity("Impossible to restore tasks").build();
+                    }
+                } catch (Exception e) {
+                    response = Response.status(404).entity("Something went wrong. The tasks were not restored.").build();
+                }
+            } else {
+                response = Response.status(403).entity("You don't have permission to restore these tasks").build();
+            }
+        } else {
+            response = Response.status(401).entity("Invalid credentials").build();
+        }
+        return response;
+    }
+
 
     @DELETE
     @Path("/delete/{taskId}")
@@ -684,7 +737,6 @@ public class UserService {
         if (userBean.isAuthenticated(token)) {
             if (userBean.userIsScrumMaster(token) || userBean.userIsProductOwner(token)) {
                 ArrayList<Task> tasksByCategory = taskBean.getTasksByCategory(category);
-                tasksByCategory.sort(Comparator.comparing(Task::getPriority, Comparator.reverseOrder()).thenComparing(Comparator.comparing(Task::getStartDate).thenComparing(Task::getLimitDate)));
                 response = Response.status(200).entity(tasksByCategory).build();
             } else {
                 response = Response.status(403).entity("You don't have permission for this request").build();
