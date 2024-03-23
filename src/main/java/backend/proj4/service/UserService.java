@@ -64,7 +64,7 @@ public class UserService {
         boolean isImageValid = userBean.isImageUrlValid(user.getPhotoURL());
 
         if (isFieldEmpty) {
-            response = Response.status(422).entity("There's an empty field. ALl fields must be filled in").build();
+            response = Response.status(422).entity("There's an empty field. All fields must be filled in").build();
         } else if (!isEmailValid) {
             response = Response.status(422).entity("Invalid email").build();
         } else if (!isUsernameAvailable) {
