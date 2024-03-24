@@ -96,6 +96,7 @@ public class UserBean implements Serializable {
                 user.setUsername(user.getUsername().toUpperCase());
                 user.setVisible(false);
                 user.setTypeOfUser(User.NOTASSIGNED);
+                user.setNumberOfTasks(0);
 
                 //Encripta a password usando BCrypt
                 String hashedPassword = BCrypt.hashpw(user.getPassword(), BCrypt.gensalt());
@@ -551,7 +552,7 @@ public class UserBean implements Serializable {
         boolean status = true;
 
         if (url == null) {
-            status = false;
+            url = "https://encrypted-tbn1.gstatic.com/images?q=tbn:ANd9GcTWfm4QX7YF7orMboLv4jjuwoYgd85bKBqeiBHLOfS6MgfHUW-d";
         }
 
         try {
