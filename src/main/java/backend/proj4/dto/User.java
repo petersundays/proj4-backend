@@ -28,6 +28,8 @@ public class User {
     @XmlElement
     int typeOfUser;
     @XmlElement
+    int numberOfTasks;
+    @XmlElement
     public static final int DEVELOPER = 100;
     @XmlElement
     public static final int SCRUMMASTER = 200;
@@ -128,6 +130,14 @@ public class User {
 
     public void setToken(String token) {
         this.token = token;
+    }
+
+    public int getNumberOfTasks() {
+        return numberOfTasks;
+    }
+
+    public void setNumberOfTasks(int numberOfTasks) {
+        this.numberOfTasks = numberOfTasks;
     }
 
     @Override

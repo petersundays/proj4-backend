@@ -28,6 +28,8 @@ public class UserBean implements Serializable {
     @EJB
     private TaskDao taskDao;
     @EJB
+    private TaskBean taskBean;
+    @EJB
     private CategoryBean categoryBean;
 
 
@@ -192,6 +194,7 @@ public class UserBean implements Serializable {
         user.setPhone(userEntity.getPhone());
         user.setPhotoURL(userEntity.getPhotoURL());
         user.setVisible(userEntity.isVisible());
+        user.setNumberOfTasks(taskBean.getNumberOfTasksFromUser(userEntity.getUsername()));
         if (userEntity.getToken() != null) {
             user.setToken(userEntity.getToken());
         } else {

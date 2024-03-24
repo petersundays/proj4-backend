@@ -66,6 +66,12 @@ public class TaskBean implements Serializable {
         return tasks;
     }
 
+    public int getNumberOfTasksFromUser(String username) {
+        UserEntity userEntity = userDao.findUserByUsername(username);
+        ArrayList<TaskEntity> entityTasks = taskDao.findTasksByUser(userEntity);
+        return entityTasks.size();
+    }
+
     public ArrayList<Task> getAllTasksFromUser(String username, String token) {
         UserEntity loggedUser = userDao.findUserByToken(token);
         UserEntity tasksOwner = userDao.findUserByUsername(username);
